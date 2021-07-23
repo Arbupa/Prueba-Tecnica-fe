@@ -43,9 +43,8 @@ const MyTable = () => {
 
   const edit = () => {
     var newData = dataApi;
-    //console.log(newData[0]._id.$oid);
+
     newData.map((company) => {
-      // console.log(companySelected._id.$oid);
       if (company._id.$oid === companySelected._id.$oid) {
         company.name = companySelected.name;
         company.description = companySelected.description;
@@ -66,9 +65,6 @@ const MyTable = () => {
             }),
           }
         );
-        if (response.ok) {
-          return console.log("Updated succesfully!");
-        }
       }
       return "There was an error";
     });
@@ -91,21 +87,20 @@ const MyTable = () => {
     setDataApi(
       dataApi.filter((company) => company._id.$oid !== companySelected._id.$oid)
     );
-    console.log("se borró correctamente");
+    // hide the modal
     setModalDelete(false);
   };
 
-  // fetch data from api
+  // fetch all data from api
   const fetchData = async () => {
     try {
       const urlApi = "http://localhost:5000/companies";
       const response = await fetch(urlApi);
       const json = await response.json();
-      //console.log(json);
       setDataApi(json);
       return json;
     } catch (error) {
-      //console.log("error", error);
+      console.log("error", error);
     }
   };
 
@@ -117,6 +112,7 @@ const MyTable = () => {
 
   //function to insert data
   const insertData = async () => {
+    // fetch to do the POST request sending headers and body arguments
     const response = await fetch("http://localhost:5000/companies", {
       method: "POST",
       headers: {
@@ -129,26 +125,26 @@ const MyTable = () => {
         symbol: companySelected.symbol,
       }),
     });
-    console.log("Inserted succesfully");
-    // aux var
+    // aux var to avoid conflicts with companySelected id field
     var valueToInsert = {
       name: companySelected.name,
       description: companySelected.description,
       symbol: companySelected.symbol,
     };
-    // Ojo aqui
-    //companySelected = valueToInsert;
+    // store the old data into our new var
     var newData = dataApi;
     // add the new element to the table
     newData.push(valueToInsert);
+    // update the state of dataApi with our newData
     setDataApi(newData);
+    // change the state of our modal hidding it
     setModalInsert(false);
   };
 
   return (
     <div className="tabla">
       <br />
-      <h3 style={{ textAlign: "center" }}>Table with data from backend</h3>
+      <h1 style={{ textAlign: "center" }}>Table with data from backend :D</h1>
       <br />
       <br />
       <button
@@ -185,7 +181,6 @@ const MyTable = () => {
                   ? "Refresh to upload..."
                   : element.uuid.$uuid}
               </td>
-              {/* <td>{element.uuid.$uuid}</td> */}
               <td>{element.name}</td>
               <td>{element.description}</td>
               <td>{element.symbol}</td>
@@ -226,19 +221,15 @@ const MyTable = () => {
               type="text"
               name="id"
               value={companySelect && companySelected._id.$oid}
-              // value={
-              //   !companySelected._id
-              //     ? "empty"
-              //     : companySelect && companySelected._id.$oid
-              // }
             />
             <br />
-            {/* {console.log(companySelect && companySelected._id.$oid)} */}
+
             <label htmlFor="">Name (limited to only 50 characters)</label>
             <input
               className="form-control"
               type="text"
               name="name"
+              // adding validations also in frontend
               value={
                 companySelected.name.length < 51
                   ? companySelect && companySelected.name
@@ -255,7 +246,7 @@ const MyTable = () => {
               className="form-control"
               type="text"
               name="description"
-              //value={companySelect && companySelected.description}
+              // adding validations also in frontend
               value={
                 companySelected.description.length < 101
                   ? companySelect && companySelected.description
@@ -270,7 +261,12 @@ const MyTable = () => {
               className="form-control"
               type="text"
               name="symbol"
-              value={companySelect && companySelected.symbol}
+              // adding validations also in frontend
+              value={
+                companySelected.symbol.length < 11
+                  ? companySelect && companySelected.symbol
+                  : ""
+              }
               onChange={handleChange}
             />
             <br />
@@ -298,18 +294,24 @@ const MyTable = () => {
           {companySelected && companySelected.name}"?
         </ModalBody>
         <ModalFooter>
-          <button onClick={() => deleteData()} className="btn btn-danger">
+          {/* on click executes deleteData function */}
+          <button
+            onClick={() => deleteData()}
+            className="btn btn-lg btn-danger"
+          >
             Yes
           </button>
           <button
+            // if "Nope" option is clicked hide the modal
             onClick={(deleteData) => setModalDelete(false)}
-            className="btn btn-secondary"
+            className="btn btn-lg btn-secondary"
           >
             Nope
           </button>
         </ModalFooter>
       </Modal>
 
+      {/* modalInsert handle the state of this modal */}
       <Modal isOpen={modalInsert}>
         <ModalHeader>
           <h3>Insert Company Information</h3>
@@ -331,6 +333,7 @@ const MyTable = () => {
               className="form-control"
               type="text"
               name="name"
+              // adding validations also in frontend
               value={
                 companySelected.name.length < 51
                   ? companySelect && companySelected.name
@@ -347,6 +350,7 @@ const MyTable = () => {
               className="form-control"
               type="text"
               name="description"
+              // adding validations also in frontend
               value={
                 companySelected.description.length < 101
                   ? companySelect && companySelected.description
@@ -361,6 +365,7 @@ const MyTable = () => {
               className="form-control"
               type="text"
               name="symbol"
+              // adding validations also in frontend
               value={
                 companySelected.symbol.length < 11
                   ? companySelect && companySelected.symbol
@@ -369,20 +374,22 @@ const MyTable = () => {
               onChange={handleChange}
             />
             <br />
-            <label htmlFor="">
-              P.S.: After insert must reload page. Sorry :(((
+            <label style={{ color: "red" }} htmlFor="">
+              P.S.: After insert, must reload page. Sorry :(((
             </label>
             <br />
           </div>
         </ModalBody>
         <ModalFooter>
           <button
+            // on click executes insertData function to create new data
             onClick={async () => await insertData()}
             className="btn btn-lg btn-primary"
           >
             Insert
           </button>
           <button
+            // if Cancel option is clicked hide ModalInsert
             onClick={() => setModalInsert(false)}
             className="btn btn-lg btn-danger"
           >
