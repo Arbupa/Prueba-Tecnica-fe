@@ -9,8 +9,6 @@ En el backend se agrega el CORS o _Cross-origin resource sharing_, así que no d
 ## Herramientas necesarias:
 
 - Tener corriendo el backend del repositorio: [link](https://github.com/Arbupa/Prueba-Tecnica)
-- Docker
-- Python 3
 - Node (para ejecutar React)
 - (opcional) no estoy seguro, pero quizá desde la ruta del proyecto ejecutar los comandos incluidos en _requirements.txt_.
 
